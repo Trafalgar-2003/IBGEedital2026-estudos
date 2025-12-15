@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Flashcards IBGE</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f6ff;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+    }
+    h1, h2 {
+      margin-bottom: 5px;
+      color: #0b3c74;
+    }
+    select {
+      padding: 6px;
+      margin-top: 10px;
+    }
+    .card {
+      background: #ffffff;
+      border: 2px solid #1e5fa8;
+      border-radius: 8px;
+      padding: 25px;
+      margin-top: 20px;
+      min-height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(30, 95, 168, 0.15);
+    }
+    .buttons {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+    }
+    button {
+      padding: 10px 15px;
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      background: #1e5fa8;
+      color: #ffffff;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #174a82;
+    }
+    .meta {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #0b3c74;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Flashcards – IBGE</h1>
+    <h2>Edital IBGE 2026</h2>
+
+    <label>Tema:</label>
+    <select id="topicSelect" onchange="changeTopic()"></select>
+
+    <div id="card" class="card"></div>
+
+    <div class="buttons">
+      <button onclick="reveal()">Virar</button>
+      <button onclick="markResult('right')">Acertei</button>
+      <button onclick="markResult('wrong')">Errei</button>
+      <button onclick="markResult('hard')">Difícil</button>
+    </div>
+
+    <div class="meta" id="meta"></div>
+  </div>
+
+  <script>
+    const data = {
+      "Direito de Petição": [
+        {"q":"Segundo a Lei 8.112/90, em quanto tempo o requerimento do servidor deve ser despachado e decidido?","a":"Despachado em até 5 dias e decidido em até 30 dias."},
+        {"q":"Qual é o prazo para interposição de pedido de reconsideração ou recurso administrativo?","a":"30 dias, contados da publicação ou da ciência da decisão."},
+        {"q":"O pedido de reconsideração deve ser dirigido a quem?","a":"À autoridade que houver expedido o ato ou proferido a primeira decisão."},
+        {"q":"O pedido de reconsideração e o recurso administrativo possuem efeito suspensivo?","a":"Não, salvo quando a autoridade competente conceder efeito suspensivo."},
+        {"q":"Em quais hipóteses o direito de petição prescreve em 5 anos?","a":"Atos de demissão, cassação de aposentadoria ou disponibilidade e atos que afetem interesse patrimonial e créditos decorrentes da relação de trabalho."},
+        {"q":"Em quanto tempo deve ser decidido o pedido de reconsideração?","a":"No prazo máximo de 30 dias."},
+        {"q":"O recurso administrativo pode ser interposto quantas vezes sucessivamente?","a":"Até três instâncias administrativas."},
+        {"q":"O provimento de pedido de reconsideração ou recurso produz efeitos a partir de quando?","a":"Retroage à data do ato impugnado."},
+        {"q":"A quem cabe o direito de petição segundo a Lei 8.112/90?","a":"Ao servidor, ao pensionista ou ao interessado."},
+        {"q":"O direito de petição pode ser exercido independentemente de pagamento de taxas?","a":"Sim, é assegurado independentemente do pagamento de taxas."}
+      ],
+      "Concessões": [
+        {"q":"Quantos dias de concessão o servidor tem direito em caso de doação de sangue?","a":"Um dia."},
+        {"q":"Quantos dias consecutivos são concedidos em razão de casamento (licença-gala)?","a":"Oito dias consecutivos."},
+        {"q":"Quantos dias consecutivos são concedidos em razão de falecimento (licença-nojo)?","a":"Oito dias consecutivos."},
+        {"q":"Quais parentes ensejam a concessão por falecimento?","a":"Cônjuge, companheiro, pais, madrasta ou padrasto, filhos, enteados, menor sob guarda ou tutela e irmãos."},
+        {"q":"A concessão por alistamento eleitoral é de quantos dias?","a":"Até dois dias, consecutivos ou não."},
+        {"q":"A concessão por júri e outros serviços obrigatórios por lei depende de compensação?","a":"Não, é concedida pelo tempo necessário."},
+        {"q":"A concessão por serviço eleitoral depende de compensação futura?","a":"Não, é considerada efetivo exercício."},
+        {"q":"A concessão por doação de sangue exige comprovação?","a":"Sim, mediante comprovação."},
+        {"q":"A concessão por falecimento inclui parentes por afinidade?","a":"Sim, madrasta e padrasto estão incluídos."},
+        {"q":"As concessões previstas na Lei 8.112/90 dependem de discricionariedade da Administração?","a":"Não, são direitos subjetivos quando preenchidos os requisitos legais."}
+      ]
+          ,"Direitos e Vantagens": [
+        {"q":"Quais são as espécies de vantagens previstas na Lei 8.112/90?","a":"Indenizações, gratificações e adicionais."},
+        {"q":"As indenizações incorporam-se à remuneração do servidor?","a":"Não, as indenizações não se incorporam à remuneração."},
+        {"q":"Quais são as espécies de indenização previstas na Lei 8.112/90?","a":"Ajuda de custo, diárias, transporte e auxílio-moradia."},
+        {"q":"Em qual hipótese a ajuda de custo NÃO será concedida?","a":"Quando o deslocamento ocorrer a pedido do servidor."},
+        {"q":"A ajuda de custo é devida em caso de retorno do servidor ao local de origem?","a":"Sim, desde que o retorno não ocorra a pedido do servidor."},
+        {"q":"As diárias serão concedidas quando o servidor se afastar da sede em caráter eventual ou transitório?","a":"Sim."},
+        {"q":"As diárias serão pagas pela metade em quais hipóteses?","a":"Quando o deslocamento não exigir pernoite fora da sede."},
+        {"q":"O servidor que se afastar da sede e retornar no mesmo dia faz jus a diárias?","a":"Não, salvo se houver pernoite."},
+        {"q":"O auxílio-transporte destina-se a custear despesas com que tipo de deslocamento?","a":"Deslocamento residência–trabalho e vice-versa."},
+        {"q":"O auxílio-moradia é devido ao servidor efetivo ou também ao comissionado sem vínculo?","a":"É devido a servidor ocupante de cargo em comissão, inclusive sem vínculo efetivo."},
+        {"q":"O auxílio-moradia exige que o servidor não possua imóvel no local de exercício?","a":"Sim, esse é um requisito legal."},
+        {"q":"Qual é o prazo máximo para pagamento do auxílio-moradia?","a":"Até 8 anos."}
+      ],
+      "Gratificações e Adicionais": [
+        {"q":"A gratificação natalina corresponde a qual fração da remuneração?","a":"1/12 da remuneração por mês de exercício."},
+        {"q":"A fração igual ou superior a quantos dias é considerada mês integral para a gratificação natalina?","a":"15 dias."},
+        {"q":"O adicional noturno incide sobre qual horário?","a":"Trabalho prestado entre 22h de um dia e 5h do dia seguinte."},
+        {"q":"Qual é o percentual do adicional noturno?","a":"25% sobre a hora diurna."},
+        {"q":"A hora noturna é computada como quantos minutos?","a":"52 minutos e 30 segundos."},
+        {"q":"O serviço extraordinário será remunerado com acréscimo de no mínimo quanto?","a":"50% em relação à hora normal."},
+        {"q":"O adicional de insalubridade é acumulável com o de periculosidade?","a":"Não, o servidor deve optar por um deles."},
+        {"q":"O encargo de curso ou concurso é devido a quais servidores?","a":"A servidores que atuem como instrutor, examinador ou fiscal."},
+        {"q":"O encargo de curso ou concurso integra a remuneração para quaisquer efeitos?","a":"Não, não se incorpora à remuneração."}
+      ],
+      "Licenças": [
+        {"q":"A licença por motivo de doença em pessoa da família é remunerada por quanto tempo?","a":"Até 60 dias, consecutivos ou não."},
+        {"q":"Após os 60 dias iniciais, a licença por doença em pessoa da família pode ser prorrogada?","a":"Sim, por até 90 dias, sem remuneração."},
+        {"q":"A licença por motivo de afastamento do cônjuge é remunerada?","a":"Não, é sem remuneração."},
+        {"q":"A licença para serviço militar é remunerada?","a":"Sim."},
+        {"q":"A licença para atividade política é remunerada em qual período?","a":"A partir do registro da candidatura até o décimo dia seguinte ao da eleição."},
+        {"q":"A licença para capacitação pode ser concedida após quantos anos de exercício?","a":"Após cada quinquênio de efetivo exercício."},
+        {"q":"Qual é o prazo máximo da licença para capacitação?","a":"Até três meses."},
+        {"q":"A licença para tratar de interesses particulares é remunerada?","a":"Não, é sem remuneração."},
+        {"q":"Qual é o prazo máximo da licença para tratar de interesses particulares?","a":"Até três anos consecutivos."}
+      ],
+      "Férias": [
+        {"q":"Qual é a duração das férias do servidor público federal?","a":"30 dias."},
+        {"q":"As férias podem ser parceladas em quantos períodos?","a":"Até três períodos, no interesse da Administração."},
+        {"q":"O servidor que opera com raios X ou substâncias radioativas faz jus a férias diferenciadas?","a":"Sim, 20 dias consecutivos por semestre de atividade."},
+        {"q":"As férias podem ser interrompidas em quais hipóteses?","a":"Calamidade pública, comoção interna, convocação para júri, serviço militar ou eleitoral."},
+        {"q":"O servidor exonerado sem usufruir férias faz jus a indenização?","a":"Sim, indenização proporcional."},
+        {"q":"As férias são consideradas tempo de efetivo exercício?","a":"Sim."},
+        {"q":"O adicional de férias corresponde a qual percentual?","a":"Um terço da remuneração."},
+        {"q":"O adicional de férias incide sobre indenização?","a":"Não, incide apenas sobre remuneração."},
+        {"q":"As férias podem ser acumuladas por necessidade do serviço?","a":"Sim, até o máximo de dois períodos."},
+        {"q":"O servidor em licença pode gozar férias no mesmo período?","a":"Não."}
+      ],
+      "Afastamentos": [
+        {"q":"O afastamento para servir em organismo internacional é remunerado?","a":"Sim, quando autorizado pelo Presidente da República."},
+        {"q":"O afastamento para estudo ou missão no exterior depende de autorização?","a":"Sim."},
+        {"q":"Qual é o prazo máximo de afastamento para estudo no exterior?","a":"Até quatro anos."},
+        {"q":"Após retornar de afastamento para estudo no exterior, o servidor pode se exonerar imediatamente?","a":"Não, deve permanecer no serviço público por período equivalente."},
+        {"q":"O afastamento para exercício de mandato eletivo é considerado efetivo exercício?","a":"Sim."},
+        {"q":"No caso de mandato de prefeito, como se dá a remuneração?","a":"O servidor é afastado e opta pela remuneração do cargo efetivo ou do mandato."},
+        {"q":"No caso de mandato de vereador com compatibilidade de horários, como se dá a remuneração?","a":"Percebe as vantagens do cargo efetivo, sem prejuízo da remuneração do mandato."},
+        {"q":"O afastamento para mandato sindical é remunerado?","a":"Sim."},
+        {"q":"Quantos servidores podem ser afastados para mandato classista por entidade?","a":"Até três servidores, conforme o número de associados."},
+        {"q":"O afastamento para mandato classista conta como efetivo exercício?","a":"Sim."}
+      ]
+          ,"Língua Portuguesa": [
+        {"q":"Na interpretação de textos da FGV, inferências devem basear-se em quê?","a":"Exclusivamente em informações explícitas ou logicamente implícitas no texto."},
+        {"q":"Coesão referencial ocorre por meio de quais recursos?","a":"Pronomes, artigos, advérbios e elipses."},
+        {"q":"Coerência textual está relacionada a quê?","a":"À progressão lógica de ideias e à ausência de contradições."},
+        {"q":"Texto expositivo tem como finalidade principal o quê?","a":"Explicar ou informar de forma objetiva."},
+        {"q":"Texto argumentativo caracteriza-se por quê?","a":"Defesa de um ponto de vista com justificativas."},
+        {"q":"Função fática da linguagem está associada a quê?","a":"Manutenção do canal de comunicação."},
+        {"q":"Função metalinguística ocorre quando?","a":"Quando a linguagem fala sobre ela mesma."},
+        {"q":"Ambiguidade sintática decorre de quê?","a":"Estrutura frasal que permite mais de uma interpretação."},
+        {"q":"O período composto caracteriza-se por quê?","a":"Presença de duas ou mais orações."},
+        {"q":"Orações subordinadas adjetivas exercem função semelhante a quê?","a":"A um adjetivo."},
+        {"q":"O uso da vírgula é obrigatório em qual situação básica?","a":"Para separar elementos enumerados."},
+        {"q":"Crase é obrigatória antes de qual palavra feminina?","a":"Aquela que admite artigo feminino."},
+        {"q":"Registro formal da língua é adequado a qual contexto?","a":"Situações oficiais e acadêmicas."},
+        {"q":"Neologismo é definido como quê?","a":"Palavra ou sentido novo incorporado à língua."},
+        {"q":"Estrangeirismo ocorre quando?","a":"Há uso de palavra de outra língua."}
+      ],
+      "Raciocínio Lógico Matemático": [
+        {"q":"Uma proposição composta é formada por quê?","a":"Duas ou mais proposições simples ligadas por conectivos."},
+        {"q":"O conectivo lógico “se... então” representa o quê?","a":"Implicação."},
+        {"q":"A negação da proposição “p e q” equivale a quê?","a":"Não p ou não q."},
+        {"q":"Conjuntos disjuntos caracterizam-se por quê?","a":"Não possuem elementos em comum."},
+        {"q":"Porcentagem representa o quê?","a":"Uma razão com denominador 100."},
+        {"q":"Juros simples incidem sobre qual valor?","a":"O capital inicial."},
+        {"q":"Proporcionalidade direta ocorre quando?","a":"As grandezas variam no mesmo sentido."},
+        {"q":"Problemas de lógica sequencial exigem principalmente quê?","a":"Identificação de padrões."},
+        {"q":"Leitura de gráficos exige atenção principal a quê?","a":"Eixos, escalas e legendas."},
+        {"q":"Probabilidade de um evento certo é igual a quanto?","a":"1."}
+      ],
+      "Ética no Serviço Público": [
+        {"q":"Segundo o Código de Ética do IBGE, qual princípio norteia a atuação do servidor?","a":"A dignidade, o decoro, o zelo e a eficiência."},
+        {"q":"O servidor pode usar informações privilegiadas em benefício próprio?","a":"Não, é vedado."},
+        {"q":"O dever de lealdade à instituição implica o quê?","a":"Atuar em conformidade com os objetivos institucionais."},
+        {"q":"Segundo a Lei 8.112, constitui dever do servidor ser assíduo e pontual?","a":"Sim."},
+        {"q":"A omissão no cumprimento de dever funcional configura infração ética?","a":"Sim."}
+      ],
+      "Noções de Informática": [
+        {"q":"O sistema operacional Windows tem como função principal o quê?","a":"Gerenciar recursos de hardware e software."},
+        {"q":"Qual programa é utilizado para edição de textos no pacote Office?","a":"Microsoft Word."},
+        {"q":"O que é uma rede de computadores?","a":"Conjunto de dispositivos interligados para troca de informações."},
+        {"q":"Qual a função principal de um navegador de internet?","a":"Acessar e visualizar páginas da web."},
+        {"q":"O backup tem qual finalidade?","a":"Garantir a recuperação de dados em caso de perda."}
+      ],
+      "Noções de Administração": [
+        {"q":"O que caracteriza uma organização como sistema aberto?","a":"Interação contínua com o ambiente externo, recebendo insumos e gerando resultados."},
+        {"q":"Quais são as quatro funções clássicas da administração?","a":"Planejamento, organização, direção e controle."},
+        {"q":"Planejamento estratégico diferencia-se do operacional por quê?","a":"O estratégico é de longo prazo e global; o operacional é de curto prazo e específico."},
+        {"q":"A organização administrativa envolve quais elementos centrais?","a":"Divisão do trabalho, hierarquia, autoridade e responsabilidade."},
+        {"q":"Direção administrativa está diretamente ligada a quais fatores humanos?","a":"Liderança, motivação e comunicação."},
+        {"q":"Controle administrativo ocorre em quais etapas básicas?","a":"Estabelecimento de padrões, medição, comparação e correção."},
+        {"q":"Motivação intrínseca está relacionada a quê?","a":"Satisfação pessoal e realização no trabalho."},
+        {"q":"Motivação extrínseca decorre principalmente de quê?","a":"Recompensas externas, como salário e benefícios."},
+        {"q":"Liderança formal difere da informal em que aspecto?","a":"A formal decorre do cargo; a informal, da influência pessoal."},
+        {"q":"Comunicação organizacional eficaz pressupõe o quê?","a":"Clareza, feedback e adequação ao público."},
+        {"q":"O processo decisório racional pressupõe o quê?","a":"Análise lógica das alternativas e consequências."},
+        {"q":"Tomada de decisão sob risco caracteriza-se por quê?","a":"Probabilidades conhecidas dos resultados."},
+        {"q":"Gestão de pessoas moderna prioriza qual visão do servidor?","a":"Servidor como parceiro estratégico."},
+        {"q":"Avaliação de desempenho tem função apenas punitiva?","a":"Não, também orienta desenvolvimento e capacitação."},
+        {"q":"Compromisso com a qualidade no serviço público envolve o quê?","a":"Eficiência, eficácia e foco no cidadão."}
+      ],
+      "Geografia": [
+        {"q":"O que são pontos cardeais?","a":"Referências básicas de orientação: norte, sul, leste e oeste."},
+        {"q":"Latitude corresponde a quê?","a":"Distância em graus em relação à Linha do Equador."},
+        {"q":"Longitude é medida a partir de qual referência?","a":"Meridiano de Greenwich."},
+        {"q":"O que representa a escala cartográfica?","a":"Relação entre distância no mapa e no espaço real."},
+        {"q":"Escala grande indica o quê?","a":"Maior detalhamento e menor área representada."},
+        {"q":"Clima equatorial caracteriza-se por quais elementos?","a":"Altas temperaturas e elevada pluviosidade."},
+        {"q":"O Cerrado é classificado como quê no território brasileiro?","a":"Bioma de savana tropical."},
+        {"q":"Qual é a principal característica do relevo brasileiro?","a":"Predomínio de planaltos e depressões."},
+        {"q":"Hidrografia brasileira destaca-se por quê?","a":"Grandes bacias hidrográficas, como a Amazônica."},
+        {"q":"O espaço agrário brasileiro passou por qual processo recente?","a":"Modernização com mecanização e concentração fundiária."},
+        {"q":"Conflitos no espaço agrário decorrem principalmente de quê?","a":"Concentração de terras e desigualdade social."},
+        {"q":"Rede urbana brasileira caracteriza-se por quê?","a":"Forte concentração populacional em grandes cidades."},
+        {"q":"Regiões metropolitanas surgem devido a quê?","a":"Integração funcional entre cidades vizinhas."},
+        {"q":"Migração interna no Brasil ocorre principalmente em busca de quê?","a":"Emprego e melhores condições de vida."},
+        {"q":"A divisão político-administrativa do Brasil reflete qual forma de Estado?","a":"Estado federativo."}
+      ]
+    };
+
+    const progress = JSON.parse(localStorage.getItem('progress')) || {};
+
+    const topicSelect = document.getElementById('topicSelect');
+    const cardEl = document.getElementById('card');
+    const metaEl = document.getElementById('meta');
+
+    let topic = null;
+    let cards = [];
+    let index = 0;
+    let showingAnswer = false;
+
+    function init() {
+      for (let t in data) {
+        const opt = document.createElement('option');
+        opt.value = t;
+        opt.textContent = t;
+        topicSelect.appendChild(opt);
+      }
+      topic = topicSelect.value;
+      loadCards();
+    }
+
+    function loadCards() {
+      cards = data[topic];
+      index = 0;
+      render();
+    }
+
+    function changeTopic() {
+      topic = topicSelect.value;
+      loadCards();
+    }
+
+    function render() {
+      showingAnswer = false;
+      cardEl.textContent = cards[index].q;
+      metaEl.textContent = `Tema: ${topic} | Card ${index + 1} de ${cards.length}`;
+    }
+
+    function reveal() {
+      if (!showingAnswer) {
+        cardEl.textContent = cards[index].a;
+        showingAnswer = true;
+      }
+    }
+
+    function markResult(type) {
+      const key = `${topic}-${index}`;
+      progress[key] = type;
+      localStorage.setItem('progress', JSON.stringify(progress));
+      index = (index + 1) % cards.length;
+      render();
+    }
+
+    init();
+  </script>
+</body>
+</html>
